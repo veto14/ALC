@@ -95,7 +95,7 @@ int main (){
 			if(fabs(matriz[i][procura_pivo_coluna(matriz,ordem,i)]) < fabs(matriz[procura_pivo_linha(matriz,ordem,i)][i]))
 			{
 				troca_linha(matriz,i,procura_pivo_linha(matriz,ordem,i),ordem);
-			}
+			}	
 		}
 	for(i = 0; i < ordem; i++)
 	{
