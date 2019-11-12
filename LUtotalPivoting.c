@@ -151,7 +151,7 @@ int main(){
         }
         puts("");
     }
-    puts("\nb' (Solu��es) = ");
+    puts("\nb' (Solucoes) = ");
     for (unsigned int i=0; i<tamA; i++){
     	printf("%.1lf\n",b[i]);
 	}

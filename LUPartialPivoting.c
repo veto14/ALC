@@ -102,7 +102,7 @@ int main(){
 	int n = 3;
 	mat A, L, P, U;
  	puts("Matrizes 1 pos LU\n");
-	_new(L); _new(P); _new(U);
+	_new(L);_new(P); _new(U);
 	A = _copy(A3);
 	_LU(A, L, U, P);
 	_mostra(A); puts("\n"); _mostra(L); puts("\n"); _mostra(U); puts("\n"); _mostra(P); puts("\n");
@@ -116,7 +116,7 @@ int main(){
 	_new(L); _new(P); _new(U);
 	A = _copy(A4);
 	_LU(A, L, U, P);
-	_show(A); puts("\n"); _show(L); puts("\n"); _show(U); puts("\n"); _show(P); puts("\n");
+	_mostra(A); puts("\n"); _mostra(L); puts("\n"); _mostra(U); puts("\n"); _mostra(P); puts("\n");
 	_del(A);  _del(L);  _del(U);  _del(P);
  
 	return 0;
