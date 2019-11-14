@@ -16,7 +16,7 @@ void h_pivot_decomp(float *a, int *p, int *q){
         pi=-1,pj=-1,max=0.0;
         //achar o pivo na submatriz A(k:n,k:n)
         for (i=k;i<n;i++) {
-            for (j=k;j<n;j++) {
+            for (j=k;j<n;j++) {	
                 if (fabs(a(i,j))>max){
                     max = fabs(a(i,j));
                     pi=i;
