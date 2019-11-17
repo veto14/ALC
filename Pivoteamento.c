@@ -2,8 +2,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-
-void troca_linha(float **matriz, int i1, int i2,int ordem){
+void troca_linha_vet(float *vetor, int i1, int i2){
+	int i;
+	float aux = 0;
+	aux = vetor[i1];
+	vetor[i1] = vetor[i2];
+	vetor[i2] = aux;
+}
+void troca_linha(float **matriz, int i1, int i2,int ordem,float *vetor){
 	
 	int i;
 	float aux;
@@ -12,7 +18,7 @@ void troca_linha(float **matriz, int i1, int i2,int ordem){
 		matriz[i1][i] = matriz[i2][i];
 		matriz[i2][i] = aux; 
 	}
-	
+	troca_linha_vet(vetor,i1,i2);	
 }
 void troca_coluna(float **matriz, int j1, int j2,int ordem){
 	
@@ -49,35 +55,71 @@ int procura_pivo_coluna(float **matriz,int ordem, int pivo){
 	return coluna;
 }
 
-void pivoteamento_total(float **matriz, int ordem){
-
+void pivoteamento_total(float **matriz, int ordem,float *vetor){
+	int i = 0;
 	//Pivoteamento total:
-		for(int i = 0; i < ordem; i++){
-			if(fabs(matriz[i][procura_pivo_coluna(matriz,ordem,i)])> fabs(matriz[procura_pivo_linha(matriz,ordem,i)][i]))
+	int linha = 0, coluna = 0;
+		for(i = 0; i < ordem; i++){
+			coluna = procura_pivo_coluna(matriz,ordem,i);
+			linha = procura_pivo_linha(matriz,ordem,i);
+
+			if(fabs(matriz[i][coluna])> fabs(matriz[linha][i]))
 			{
-				troca_coluna(matriz,i,procura_pivo_coluna(matriz,ordem,i),ordem);
+				troca_coluna(matriz,i,coluna,ordem);
 			}
-			if(fabs(matriz[i][procura_pivo_coluna(matriz,ordem,i)]) < fabs(matriz[procura_pivo_linha(matriz,ordem,i)][i]))
+			if(fabs(matriz[i][coluna]) < fabs(matriz[linha][i]))
 			{
-				troca_linha(matriz,i,procura_pivo_linha(matriz,ordem,i),ordem);
+				troca_linha(matriz,i,linha,ordem,vetor);
 			}
 		}
 }
 
+void escalonamento(float **A,int n,float *vetor_b){
+	float c = 0;
+	int j,i,k;
+	for(j = 0; j< n; j++){ //loop pra escalonar
+        for(i = 0; i< n; i++){
+            if(i > j){
+                c = A[i][j] / A[j][j];
+                for(k = 0; k < n; k++){
+                    A[i][k] = A[i][k] - (c*A[j][k]);
+                }
+                vetor_b[i] = vetor_b[i] - (c*vetor_b[j]);
+            }
+        }
+    }
+}
+void substituicao(float **matriz, int ordem, float *vetor, float *x){
+	int i = 0, j = 0;
+	int omi = 0;
+	float aux = 0;
+	for (i = ordem -1; i >= 0; i--)
+	{	
+		aux = 0;
+		omi = ordem - i -1;
+		for (j = i+1; j < ordem; ++j)
+		{
+			aux += (matriz[i][j] * x[j]);
+		}
+		x[i] = (vetor[i] - aux) / matriz[i][i];
+	}
+}
 int main (){
 
-	float **matriz;
+	float **matriz,*vetor_b,*x;
 	int ordem,i = 0,j = 0;
 	
 	printf("Ordem da matriz:\n");
 	scanf("%i",&ordem);
-	
-	matriz = malloc(sizeof(float*) * ordem);
-	
-	for(i = 0;i < ordem; i++)
-	{
-		matriz[i] = malloc(sizeof(float) * ordem);
-	}
+	//Alocando espaço da memória:
+		matriz = malloc(sizeof(float*) * ordem);
+		vetor_b = malloc(sizeof(float) * ordem);
+		x = malloc(sizeof(float) * ordem);
+		
+		for(i = 0;i < ordem; i++)
+		{
+			matriz[i] = malloc(sizeof(float) * ordem);
+		}
 	
 	for(i = 0; i < ordem; i++)
 	{
@@ -86,31 +128,56 @@ int main (){
 			scanf("%f",&matriz[i][j]);
 		}	
 	}
+	printf("Agora, insira os dados do vetor b:\n");
+	for (i = 0; i < ordem; ++i) {
+		scanf("%f",&vetor_b[i]);
+	}
 	//Pivoteamento total:
-		for(i = 0; i < ordem; i++){
-			if(fabs(matriz[i][procura_pivo_coluna(matriz,ordem,i)])> fabs(matriz[procura_pivo_linha(matriz,ordem,i)][i]))
-			{
-				troca_coluna(matriz,i,procura_pivo_coluna(matriz,ordem,i),ordem);
-			}
-			if(fabs(matriz[i][procura_pivo_coluna(matriz,ordem,i)]) < fabs(matriz[procura_pivo_linha(matriz,ordem,i)][i]))
-			{
-				troca_linha(matriz,i,procura_pivo_linha(matriz,ordem,i),ordem);
-			}	
-		}
-	for(i = 0; i < ordem; i++)
-	{
+		pivoteamento_total(matriz,ordem,vetor_b);
+	//
+
+	printf("===============MATRIZ===============\n");
+	for(i = 0; i < ordem; i++) {
 		for(j = 0; j < ordem; j++)
 		{
-			printf("[%.2f]\t",matriz[i][j]);
+			printf("[%f] ",matriz[i][j]);
 		}	
 		printf("\n");
 	}
+	printf("===============VETOR-B===============\n");
 	
-	
-	for(i = 0;i < ordem; i++)
-	{
-		free(matriz[i]);
+	for(j = 0; j < ordem; j++) {
+		printf("[%f]\n",vetor_b[j]);
 	}
-	free(matriz);
+	printf("===============APOS=ESCALONAMENTO===============\n\n\n");
+	escalonamento(matriz,ordem,vetor_b);
+	printf("===============MATRIZ===============\n");
+	for(i = 0; i < ordem; i++) {
+		for(j = 0; j < ordem; j++)
+		{
+			printf("[%f] ",matriz[i][j]);
+		}	
+		printf("\n");
+	}
+	printf("===============VETOR-B===============\n");
+	
+	for(j = 0; j < ordem; j++) {
+		printf("[%f]\n",vetor_b[j]);
+	}
+	substituicao(matriz,ordem,vetor_b,x);
+	printf("===============SOLUCOES===============\n");
+	for (i = 0; i < ordem; ++i)
+	{
+		printf("X[%i]: %f\n",i,x[i]);
+	}
+	printf("\n");
+	//Liberando memória alocada:
+		for(i = 0;i < ordem; i++)
+		{
+			free(matriz[i]);
+		}
+		free(matriz);
+		free(vetor_b);
+		free(x);
 return 0;
 }
